@@ -116,15 +116,14 @@ prompt_pure_preprompt_render() {
 	[[ -n ${prompt_pure_cmd_timestamp+x} && "$1" != "precmd" ]] && return
 
 	# set color for git branch/dirty status, change color if dirty checking has been delayed
-	local git_color=242
+	local git_color=11
 	[[ -n ${prompt_pure_git_last_dirty_check_timestamp+x} ]] && git_color=red
 
 	# construct preprompt, beginning with path
-	local preprompt="%F{blue}%~%f"
 	# git info
-	preprompt+="%F{$git_color}${vcs_info_msg_0_}${prompt_pure_git_dirty}%f"
+	local preprompt="▿%F{$git_color}${vcs_info_msg_0_}${prompt_pure_git_dirty}%f"
 	# git pull/push arrows
-	preprompt+="%F{cyan}${prompt_pure_git_arrows}%f"
+	preprompt+="%F{magenta}${prompt_pure_git_arrows}%f"
 	# username and machine if applicable
 	preprompt+=$prompt_pure_username
 	# execution time
@@ -250,7 +249,7 @@ prompt_pure_async_git_dirty() {
 	if [[ $untracked_dirty = 0 ]]; then
 		command git diff --no-ext-diff --quiet --exit-code
 	else
-		test -z "$(command git status --porcelain --ignore-submodules -unormal)"
+		command git status --porcelain --ignore-submodules -unormal
 	fi
 
 	return $?
@@ -344,6 +343,11 @@ prompt_pure_check_git_arrows() {
 	typeset -g REPLY=" $arrows"
 }
 
+maybe_git_count() {
+  local prefix=$1 count=$(echo $2 | tr -d '[:space:]')
+  (( count != 0 )) && echo "${prefix}${count}%f"
+}
+
 prompt_pure_async_callback() {
 	setopt localoptions noshwordsplit
 	local job=$1 code=$2 output=$3 exec_time=$4
@@ -357,10 +361,20 @@ prompt_pure_async_callback() {
 			;;
 		prompt_pure_async_git_dirty)
 			local prev_dirty=$prompt_pure_git_dirty
-			if (( code == 0 )); then
-				prompt_pure_git_dirty=
+			if [[ $output == "" ]]; then
+				prompt_pure_git_dirty="│%F{11}✔%f"
 			else
-				prompt_pure_git_dirty="*"
+        local staged=$(echo $output | grep -E '^(M|A|D|R|C)(\s|M|D)' | grep -v '^DD' | wc -l)
+        local unmerged=$(echo $output | grep -E '^(D|A|U)(D|A|U)' | grep -v '^AD' | wc -l)
+        local unstaged=$(echo $output | grep -E '^\s(M|D)' | wc -l)
+        local untracked=$(echo $output | grep '^??' | wc -l)
+
+        local staged_str=$(maybe_git_count "%F{red}⦁" $staged)
+        local unmerged_str=$(maybe_git_count "%F{red}x" $unmerged)
+        local unstaged_str=$(maybe_git_count "%F{blue}✚" $unstaged)
+        local untracked_str=$(maybe_git_count "%F{11}.." $untracked)
+
+				prompt_pure_git_dirty="│${staged_str}${unmerged_str}${unstaged_str}${untracked_str}"
 			fi
 
 			[[ $prev_dirty != $prompt_pure_git_dirty ]] && prompt_pure_preprompt_render
@@ -424,13 +438,14 @@ prompt_pure_setup() {
 	fi
 
 	# show username@host if logged in through SSH
-	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username=' %F{242}%n@%m%f'
+	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username=' %F{11}%n@%m%f'
 
 	# show username@host if root, with username in white
-	[[ $UID -eq 0 ]] && prompt_pure_username=' %F{white}%n%f%F{242}@%m%f'
+	[[ $UID -eq 0 ]] && prompt_pure_username=' %F{white}%n%f%F{11}@%m%f'
 
 	# prompt turns red if the previous command didn't exit with 0
-	PROMPT='%(?.%F{magenta}.%F{red})${PURE_PROMPT_SYMBOL:-❯}%f '
+	PROMPT='%(?.%F{cyan}.%F{red})${PURE_PROMPT_SYMBOL:-𝝺}%f '
+  RPROMPT='%F{green}%~%f'
 }
 
 prompt_pure_setup "$@"

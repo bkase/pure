@@ -1,5 +1,15 @@
 # Pure
 
+## Fork by bkase
+
+* Better colors for solarized dark terminal
+* Git info more detailed (ala [zsh-git-prompt](https://github.com/olivierverdier/zsh-git-prompt))
+* Swap out ❯ character for 𝝺
+* Move the working directory to the right ala `prompt walters`
+* Put a little triangle character ▿ to replace void of path on the preprompt line
+
+===
+
 > Pretty, minimal and fast ZSH prompt
 
 <img src="screenshot.png" width="864">
