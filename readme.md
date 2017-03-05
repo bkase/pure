@@ -8,12 +8,11 @@
 * Move the working directory to the right ala `prompt walters`
 * Put a little triangle character ▿ to replace void of path on the preprompt line
 
+<img src="screenshot.png">
+
 ===
 
 > Pretty, minimal and fast ZSH prompt
-
-<img src="screenshot.png" width="864">
-
 
 ## Overview
 
