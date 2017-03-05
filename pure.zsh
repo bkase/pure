@@ -356,7 +356,7 @@ prompt_pure_async_callback() {
 		prompt_pure_async_git_aliases)
 			if [[ -n $output ]]; then
 				# append custom git aliases to the predefined ones.
-				prompt_pure_git_fetch_pattern+="|$output"
+				prompt_pure_git_fetch_pattern+="│$output"
 			fi
 			;;
 		prompt_pure_async_git_dirty)
@@ -364,10 +364,10 @@ prompt_pure_async_callback() {
 			if [[ $output == "" ]]; then
 				prompt_pure_git_dirty="│%F{11}✔%f"
 			else
-        local staged=$(echo $output | grep -E '^(M|A|D|R|C)(\s|M|D)' | grep -v '^DD' | wc -l)
-        local unmerged=$(echo $output | grep -E '^(D|A|U)(D|A|U)' | grep -v '^AD' | wc -l)
-        local unstaged=$(echo $output | grep -E '^\s(M|D)' | wc -l)
-        local untracked=$(echo $output | grep '^??' | wc -l)
+        local staged="$(echo $output | grep -E '^(M|A|D|R|C)(\s|M|D)' | grep -v '^DD' | wc -l)"
+        local unmerged="$(echo $output | grep -E '^(D|A|U)(D|A|U)' | grep -v '^AD' | wc -l)"
+        local unstaged="$(echo $output | grep -E '^\s(M|D)' | wc -l)"
+        local untracked="$(echo $output | grep '^??' | wc -l)"
 
         local staged_str=$(maybe_git_count "%F{red}⦁" $staged)
         local unmerged_str=$(maybe_git_count "%F{red}x" $unmerged)
@@ -428,7 +428,7 @@ prompt_pure_setup() {
 	# vcs_info_msg_0_ = ' %b' (for branch)
 	# vcs_info_msg_1_ = 'x%R' git top level (%R), x-prefix prevents creation of a named path (AUTO_NAME_DIRS)
 	zstyle ':vcs_info:git*' formats ' %b' 'x%R'
-	zstyle ':vcs_info:git*' actionformats ' %b|%a' 'x%R'
+	zstyle ':vcs_info:git*' actionformats ' %b│%a' 'x%R'
 
 	# if the user has not registered a custom zle widget for clear-screen,
 	# override the builtin one so that the preprompt is displayed correctly when
