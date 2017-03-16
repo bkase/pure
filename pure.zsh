@@ -356,7 +356,7 @@ prompt_pure_async_callback() {
 		prompt_pure_async_git_aliases)
 			if [[ -n $output ]]; then
 				# append custom git aliases to the predefined ones.
-				prompt_pure_git_fetch_pattern+="│$output"
+				prompt_pure_git_fetch_pattern+="|$output"
 			fi
 			;;
 		prompt_pure_async_git_dirty)
